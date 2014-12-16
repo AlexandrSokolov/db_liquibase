@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="db.datasets_1" author="sav">
+        <preConditions onFail="MARK_RAN">
+            <changeLogPropertyDefined property="dataset" value="production"/>
+        </preConditions>
+
+        <insert tableName="domain_all_fields">
+            <column name="id" value="1" />
+            <column name="comments" value="comment_1_value"/>
+            <column name="clob_string" value="clob1_value"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="csv.datasets_1" author="sav">
+        <preConditions onFail="MARK_RAN">
+            <changeLogPropertyDefined property="dataset" value="production"/>
+        </preConditions>
+
+        <loadData encoding="UTF-8"
+                  file="db/datasets/csv/domain_all_fields.dataset.csv"
+                  quotchar='"'
+                  separator="|"
+                  tableName="domain_all_fields">
+            <column name="id"/>
+            <column name="comments"/>
+            <column name="clob_string"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

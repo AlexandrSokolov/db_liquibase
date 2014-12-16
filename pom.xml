@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.savdev.appname</groupId>
+    <artifactId>database</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>database</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>install database into hsqldb memory (default profile)</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>db_type</name>
+                    <value>hsql_embedded</value>
+                </property>
+            </activation>
+            <properties>
+                <db.connection.properties>src/main/resources/db/config/hsql_embedded.properties
+                </db.connection.properties>
+            </properties>
+        </profile>
+        <profile>
+            <id>install database into mysql</id>
+            <activation>
+                <property>
+                    <name>db_type</name>
+                    <value>mysql</value>
+                </property>
+            </activation>
+            <properties>
+                <db.connection.properties>src/main/resources/db/config/mysql.properties</db.connection.properties>
+            </properties>
+        </profile>
+        <profile>
+            <id>install database into postgres</id>
+            <activation>
+                <property>
+                    <name>db_type</name>
+                    <value>postgres</value>
+                </property>
+            </activation>
+            <properties>
+                <db.connection.properties>src/main/resources/db/config/postgresql.properties</db.connection.properties>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>3.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--jdbc drivers START-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.178</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.25</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--jdbc drivers END-->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--allows to read properties in the initialize phase-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-1</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <quiet>false</quiet>
+                            <files>
+                                <file>${db.connection.properties}</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--allows to remove folder-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>gen</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <!--liquibase plugin to work with database-->
+            <plugin>
+                <!--to run plugin:-->
+                <!--mvn clean install initialize liquibase:updateSQL-->
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <!--the properties specified defined in the properties file will be used in preference over those
+                        defined in the <configuration> section (or configured implicitly).-->
+                    <propertyFileWillOverride>true</propertyFileWillOverride>
+                    <propertyFile>db/config/liquibase.properties</propertyFile>
+
+                    <!--the following params are defined via properties file when the plugin is executed-->
+                    <driver>${driver}</driver>
+                    <url>${connection_url}</url>
+                    <username>${username}</username>
+                    <password>${password}</password>
+
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>

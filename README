@@ -1,0 +1,12 @@
+Steps to use this module:
+1.  Configure database connection depending on the database type (hsql_file, hsql_embedded,mysql) in one of the:
+   /db/config/hsql_embedded.properties
+   /db/config/hsql_file.properties
+   /db/config/mysql.properties
+2.  Configure liquibase-specific properties if needed:
+   /db/config/liquibase.properties
+3. From the "database" folder run one of the following:
+   "scripts/install_hsqldb_file_based.bat" > build.log 2>&1
+   ...
+4. If you need to clean file-based database (remove the "gen" folder), run 
+   mvn clean
